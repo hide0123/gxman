@@ -21,7 +21,7 @@ or to check the type of the installed one.`,
 		}
 
 		if version {
-			fmt.Println("gxman version 1.0.0")
+			fmt.Println("gxman version 1.0.1")
 		} else {
 			cmd.Help()
 		}
