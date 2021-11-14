@@ -4,7 +4,7 @@ A tool for 3gxtool
 # Install
 
 ```
-$ go install github.com/HIDE810/gxman@latest
+$ go install github.com/HIDE810/gxman@<tag>
 ```
 
 # License
