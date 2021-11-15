@@ -3,16 +3,27 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"runtime/debug"
 
 	"github.com/spf13/cobra"
 )
+
+func getVersion() string {
+	if buildInfo, ok := debug.ReadBuildInfo(); ok {
+		return buildInfo.Main.Version
+	} else {
+		return "Failed to read build info"
+	}
+}
 
 var rootCmd = &cobra.Command{
 	Use:   "gxman",
 	Short: "A tool for 3gxtool",
 	Long: `gxman is a CLI tool for 3gxtool.
 This tool is used to install the latest one
-or to check the type of the installed one.`,
+or to check the type of the installed one.
+
+Version: ` + getVersion(),
 	Run: func(cmd *cobra.Command, args []string) {
 		version, err := cmd.Flags().GetBool("version")
 		if err != nil {
@@ -21,7 +32,7 @@ or to check the type of the installed one.`,
 		}
 
 		if version {
-			fmt.Println("gxman version 1.0.2")
+			fmt.Println("gxman", getVersion())
 		} else {
 			cmd.Help()
 		}
