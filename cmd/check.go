@@ -13,20 +13,16 @@ var checkCmd = &cobra.Command{
 	Use:   "check",
 	Short: "Check the type of your 3gxtool",
 	Run: func(cmd *cobra.Command, args []string) {
-		dkp := os.Getenv("DEVKITPRO")
-		if dkp == "" {
-			fmt.Println("error: Please set the DEVKITPRO environment.")
-			os.Exit(1)
-		}
-
-		var offset int
-		path := dkp
+		var (
+			offset int
+			path   string
+		)
 
 		if runtime.GOOS == "windows" {
-			path += "/tools/bin/3gxtool.exe"
+			path = "c:\\devkitPro\\tools\\bin\\3gxtool.exe"
 			offset = 0x11B1
 		} else if runtime.GOOS == "linux" {
-			path += "/tools/bin/3gxtool"
+			path = "/opt/devkitpro/tools/bin/3gxtool"
 			offset = 0x2AF7
 		} else {
 			fmt.Println("error: Unsupported OS.")
