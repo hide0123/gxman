@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func install(path string, url string) {
+func install(path string, url string, patched bool) {
 	fmt.Println("Installing...")
 
 	resp, err := http.Get(url)
@@ -33,7 +33,11 @@ func install(path string, url string) {
 		os.Chmod(path, 0755)
 	}
 
-	fmt.Println("3gxtool was successfully installed.")
+	if patched {
+		fmt.Println("3gxtool (No 1 MiB limit) was successfully installed.")
+	} else {
+		fmt.Println("3gxtool was successfully installed.")
+	}
 }
 
 var getCmd = &cobra.Command{
@@ -61,9 +65,9 @@ var getCmd = &cobra.Command{
 		}
 
 		if unlimited {
-			install(path, patched)
+			install(path, patched, true)
 		} else {
-			install(path, normal)
+			install(path, normal, false)
 		}
 	},
 }
