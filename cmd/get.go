@@ -5,16 +5,18 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"runtime"
 
 	"github.com/spf13/cobra"
 )
 
-func install(url string) {
-	path := "/opt/devkitpro/tools/bin"
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		fmt.Println("error:", path, "is not found. Please install devkitPro.")
+func install(name string, url string) {
+	dkp := os.Getenv("DEVKITPRO")
+	if dkp == "" {
+		fmt.Println("error: Please set the DEVKITPRO environment.")
 		os.Exit(1)
 	}
+	path := dkp + "/tools/bin"
 
 	fmt.Println("Installing...")
 
@@ -25,7 +27,7 @@ func install(url string) {
 	}
 	defer resp.Body.Close()
 
-	file, err := os.Create(path + "/3gxtool")
+	file, err := os.Create(path + "/" + name)
 	if err != nil {
 		fmt.Println("error", err)
 		os.Exit(1)
@@ -33,7 +35,10 @@ func install(url string) {
 	defer file.Close()
 
 	io.Copy(file, resp.Body)
-	os.Chmod(path+"/3gxtool", 0755)
+
+	if runtime.GOOS == "linux" {
+		os.Chmod(path+"/"+name, 0755)
+	}
 
 	fmt.Println("3gxtool was successfully installed in", path)
 }
@@ -42,8 +47,19 @@ var getCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Install the latest 3gxtool",
 	Run: func(cmd *cobra.Command, args []string) {
-		normal := "https://cdn.discordapp.com/attachments/463776354899460101/718621100665208842/3gxtool"
-		patched := "https://cdn.discordapp.com/attachments/479233444249862174/908696881297760296/3gxtool"
+		var bin, normal, patched string
+		if runtime.GOOS == "windows" {
+			bin = "3gxtool.exe"
+			normal = "https://cdn.discordapp.com/attachments/479233979271086090/707634663765573753/3gxtool.exe"
+			patched = "https://cdn.discordapp.com/attachments/512385640852357150/825415395036758057/3gxtool.exe"
+		} else if runtime.GOOS == "linux" {
+			bin = "3gxtool"
+			normal = "https://cdn.discordapp.com/attachments/463776354899460101/718621100665208842/3gxtool"
+			patched = "https://cdn.discordapp.com/attachments/479233444249862174/908696881297760296/3gxtool"
+		} else {
+			fmt.Println("error: Unsupported OS.")
+			os.Exit(1)
+		}
 
 		unlimited, err := cmd.Flags().GetBool("unlimited")
 		if err != nil {
@@ -52,9 +68,9 @@ var getCmd = &cobra.Command{
 		}
 
 		if unlimited {
-			install(patched)
+			install(bin, patched)
 		} else {
-			install(normal)
+			install(bin, normal)
 		}
 	},
 }
